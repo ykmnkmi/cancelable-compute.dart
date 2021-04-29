@@ -10,9 +10,18 @@ int fib(int n) {
 }
 
 void main() {
-  test('Compute Test', () {
-    expect(fib(5), equals(5));
-    final operation = compute(fib, 5);
-    expect(operation.value, completion(equals(5)));
+  group('Cancelable Compute', () {
+    test('Normal', () {
+      final operation = compute(fib, 5);
+      expect(operation.value, completion(equals(5)));
+    });
+
+    test('Cancel', () {
+      final operation = compute(fib, 128);
+      Future<void>.delayed(Duration(seconds: 1), operation.cancel);
+      expect(operation.value, completion(isNull));
+    }, onPlatform: {
+      'browser': Skip('no Isolate'),
+    });
   });
 }

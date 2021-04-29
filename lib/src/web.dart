@@ -3,26 +3,14 @@ import 'dart:async';
 import 'types.dart';
 
 ComputeOperation<R> compute<Q, R>(ComputeCallback<Q, R> callback, Q message, {String? debugLabel}) {
-  return _WebComputeOperation<R>.fromFuture(Future<R>.sync(() => callback(message)));
+  //
+  return _WebComputeOperation<R>(Future<R>(() => callback(message)));
 }
 
 class _WebComputeOperation<R> implements ComputeOperation<R> {
-  _WebComputeOperation.fromFuture(Future<R> future)
-      : completer = Completer<R?>(),
-        canceled = false {
-    // ignore if canceled
-    future.then<void>((value) {
-      if (!canceled) {
-        completer.complete(value);
-      }
-    }).catchError((Object error, [StackTrace? stackTrace]) {
-      if (!canceled) {
-        completer.completeError(error, stackTrace);
-      }
-    });
-  }
+  _WebComputeOperation(this.future) : canceled = false;
 
-  final Completer<R?> completer;
+  final Future<R> future;
 
   bool canceled;
 
@@ -33,15 +21,11 @@ class _WebComputeOperation<R> implements ComputeOperation<R> {
 
   @override
   Future<R?> get value {
-    return completer.future;
+    return future;
   }
 
   @override
   void cancel() {
     canceled = true;
-
-    if (!completer.isCompleted) {
-      completer.complete();
-    }
   }
 }
