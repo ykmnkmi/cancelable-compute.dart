@@ -55,7 +55,7 @@ ComputeOperation<R> compute<Q, R>(ComputeCallback<Q, R> callback, Q message, {St
       assert(data == null || data is R);
 
       if (!operation.isCompleted) {
-        operation.complete(data);
+        operation.complete(data as R);
       }
 
       finish();
@@ -92,8 +92,6 @@ class _IOComputeOperation<R> implements ComputeOperation<R> {
 
   @override
   void cancel() {
-    print('cancel');
-
     canceled = true;
     onCancel();
 
