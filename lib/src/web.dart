@@ -3,7 +3,6 @@ import 'dart:async';
 import 'types.dart';
 
 ComputeOperation<R> compute<Q, R>(ComputeCallback<Q, R> callback, Q message, {String? debugLabel}) {
-  //
   return _WebComputeOperation<R>(Future<R>(() => callback(message)));
 }
 
