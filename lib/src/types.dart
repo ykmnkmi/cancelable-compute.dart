@@ -4,7 +4,8 @@ import 'dart:async' show FutureOr;
 typedef ComputeCallback<Q, R> = FutureOr<R> Function(Q message);
 
 /// [compute] signature.
-typedef Compute = ComputeOperation<R> Function<Q, R>(ComputeCallback<Q, R> callback, Q message);
+typedef Compute = ComputeOperation<R> Function<Q, R>(
+    ComputeCallback<Q, R> callback, Q message);
 
 /// [compute] cancellable operation.
 abstract class ComputeOperation<R> {
