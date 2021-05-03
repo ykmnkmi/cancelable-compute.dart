@@ -1,4 +1,5 @@
 .dart_tool/
+.vscode/
 .packages
 build/
 web/

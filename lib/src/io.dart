@@ -3,10 +3,11 @@ import 'dart:isolate';
 
 import 'types.dart';
 
-ComputeOperation<R> compute<Q, R>(ComputeCallback<Q, R> callback, Q message, {String? debugLabel}) {
+ComputeOperation<R> compute<Q, R>(ComputeCallback<Q, R> callback, Q message) {
   final resultPort = ReceivePort();
   final exitPort = ReceivePort();
   final errorPort = ReceivePort();
+
   var running = true;
   Isolate? runningIsolate;
 
@@ -21,7 +22,8 @@ ComputeOperation<R> compute<Q, R>(ComputeCallback<Q, R> callback, Q message, {St
   }
 
   final operation = _IOComputeOperation<R>(finish);
-  final configuration = _OperationConfiguration<Q, R>(callback, message, resultPort.sendPort);
+  final configuration =
+      _OperationConfiguration<Q, R>(callback, message, resultPort.sendPort);
 
   Isolate.spawn<_OperationConfiguration<Q, R>>(_spawn, configuration,
           onExit: exitPort.sendPort, onError: errorPort.sendPort)
@@ -45,7 +47,8 @@ ComputeOperation<R> compute<Q, R>(ComputeCallback<Q, R> callback, Q message, {St
 
     exitPort.listen((_) {
       if (!operation.isCompleted) {
-        operation.completeError(Exception('Isolate exited without result or error.'));
+        operation.completeError(
+            Exception('Isolate exited without result or error.'));
       }
 
       finish();
@@ -66,13 +69,13 @@ ComputeOperation<R> compute<Q, R>(ComputeCallback<Q, R> callback, Q message, {St
 }
 
 class _IOComputeOperation<R> implements ComputeOperation<R> {
-  _IOComputeOperation(this.onCancel)
+  _IOComputeOperation(this.call)
       : completer = Completer<R?>(),
         canceled = false;
 
   final Completer<R?> completer;
 
-  final void Function() onCancel;
+  final void Function() call;
 
   bool canceled;
 
@@ -93,7 +96,7 @@ class _IOComputeOperation<R> implements ComputeOperation<R> {
   @override
   void cancel() {
     canceled = true;
-    onCancel();
+    call();
 
     if (!completer.isCompleted) {
       completer.complete();
@@ -128,5 +131,6 @@ class _OperationConfiguration<Q, R> {
 }
 
 Future<void> _spawn<Q, R>(_OperationConfiguration<Q, R> configuration) {
-  return Future<R>.sync(() => configuration.apply()).then<void>(configuration.resultPort.send);
+  return Future<R>.sync(() => configuration.apply())
+      .then<void>(configuration.resultPort.send);
 }
