@@ -1,14 +1,21 @@
-A library for Dart developers.
+## cancelable_compute.dart
+
+Allows you to cancel compute operation.
 
 ## Usage
 
 A simple usage example:
 
 ```dart
-import 'package:compute/compute.dart';
-
-main() {
-  var awesome = new Awesome();
+Future<void> main() async {
+  var operation = compute(fib, 256);
+  
+  void onTap() {
+    operation.cancel();
+  }
+  
+  final result = await operation.value;
+  print(result ?? -1);
 }
 ```
 
@@ -16,4 +23,8 @@ main() {
 
 Please file feature requests and bugs at the [issue tracker][tracker].
 
-[tracker]: http://example.com/issues/replaceme
+[tracker]: https://github.com/ykmnkmi/cancelable_compute.dart/issues
+
+## License
+
+MIT
