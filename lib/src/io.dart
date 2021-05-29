@@ -22,14 +22,13 @@ ComputeOperation<R> compute<Q, R>(ComputeCallback<Q, R> callback, Q message) {
   }
 
   final operation = _IOComputeOperation<R>(finish);
-  final configuration =
-      _OperationConfiguration<Q, R>(callback, message, resultPort.sendPort);
+  final configuration = _OperationConfiguration<Q, R>(callback, message, resultPort.sendPort);
 
   Isolate.spawn<_OperationConfiguration<Q, R>>(_spawn, configuration,
           onExit: exitPort.sendPort, onError: errorPort.sendPort)
       .then<void>((isolate) {
     runningIsolate = isolate;
-    errorPort.listen((data) {
+    errorPort.listen((dynamic data) {
       assert(data is List);
       assert(data.length == 2);
 
@@ -45,16 +44,15 @@ ComputeOperation<R> compute<Q, R>(ComputeCallback<Q, R> callback, Q message) {
       finish();
     });
 
-    exitPort.listen((_) {
+    exitPort.listen((dynamic data) {
       if (!operation.isCompleted) {
-        operation.completeError(
-            Exception('Isolate exited without result or error.'));
+        operation.completeError(Exception('Isolate exited without result or error.'));
       }
 
       finish();
     });
 
-    resultPort.listen((data) {
+    resultPort.listen((dynamic data) {
       assert(data == null || data is R);
 
       if (!operation.isCompleted) {
@@ -131,6 +129,5 @@ class _OperationConfiguration<Q, R> {
 }
 
 Future<void> _spawn<Q, R>(_OperationConfiguration<Q, R> configuration) {
-  return Future<R>.sync(() => configuration.apply())
-      .then<void>(configuration.resultPort.send);
+  return Future<R>.sync(() => configuration.apply()).then<void>(configuration.resultPort.send);
 }
