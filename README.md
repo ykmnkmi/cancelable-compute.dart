@@ -1,4 +1,6 @@
-## cancelable_compute.dart
+[![pub package](https://img.shields.io/pub/v/lints.svg)](https://pub.dev/packages/cancelable_compute)
+
+## cancelable-compute.dart
 
 Allows you to cancel compute operation.
 
@@ -7,15 +9,17 @@ Allows you to cancel compute operation.
 A simple usage example:
 
 ```dart
+import 'package:cancelable_compute/cancelable_compute.dart';
+
 Future<void> main() async {
   var operation = compute(fib, 256);
   
   void onTap() {
-    operation.cancel();
+    operation.cancel(-1);
   }
   
   final result = await operation.value;
-  print(result ?? -1);
+  print(result!);
 }
 ```
 
@@ -23,7 +27,7 @@ Future<void> main() async {
 
 Please file feature requests and bugs at the [issue tracker][tracker].
 
-[tracker]: https://github.com/ykmnkmi/cancelable_compute.dart/issues
+[tracker]: https://github.com/ykmnkmi/cancelable-compute.dart/issues
 
 ## License
 

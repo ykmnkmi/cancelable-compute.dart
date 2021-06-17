@@ -20,7 +20,7 @@ void main() {
       final operation = compute(fib, 128);
       Future<void>.delayed(Duration(seconds: 1), operation.cancel);
       expect(operation.value, completion(isNull));
-    }, onPlatform: <String, Object>{
+    }, onPlatform: <String, Object?>{
       'browser': Skip('no Isolate'),
     });
   });

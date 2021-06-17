@@ -1,14 +1,13 @@
 name: cancelable_compute
-description: Allows you to cancel compute operation.
-version: 1.0.2
-homepage: https://github.com/ykmnkmi/cancelable_compute.dart
-repository: https://github.com/ykmnkmi/cancelable_compute.dart
-issue_tracker: https://github.com/ykmnkmi/cancelable_compute.dart/issues
+description: Cancelable compute operation.
+version: 1.1.0
+homepage: https://github.com/ykmnkmi/cancelable-compute.dart
+repository: https://github.com/ykmnkmi/cancelable-compute.dart
+issue_tracker: https://github.com/ykmnkmi/cancelable-compute.dart/issues
 
 environment:
   sdk: '>=2.13.0 <3.0.0'
 
 dev_dependencies:
   lints: ^1.0.1
-  test: ^1.17.5
-
+  test: ^1.17.8
