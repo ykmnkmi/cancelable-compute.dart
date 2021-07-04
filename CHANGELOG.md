@@ -1,3 +1,7 @@
+## 1.1.1
+
+- Update meta.
+
 ## 1.1.0
 
 - Add a `value` parameter to `ComputeOperation<R>.cancal()`.

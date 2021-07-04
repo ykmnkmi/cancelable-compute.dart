@@ -1,8 +1,8 @@
-[![pub package](https://img.shields.io/pub/v/lints.svg)](https://pub.dev/packages/cancelable_compute)
+[![pub package](https://img.shields.io/pub/v/cancelable_compute.svg)](https://pub.dev/packages/cancelable_compute)
 
 ## cancelable-compute.dart
 
-Allows you to cancel compute operation.
+Spawn an isolate, run callback on that isolate, passing it message, and return the value returned by callback or canceled by user.
 
 ## Usage
 
@@ -12,11 +12,13 @@ A simple usage example:
 import 'package:cancelable_compute/cancelable_compute.dart';
 
 Future<void> main() async {
-  var operation = compute(fib, 256);
+  final operation = compute(fib, 256);
   
   void onTap() {
     operation.cancel(-1);
   }
+
+  // ...
   
   final result = await operation.value;
   print(result!);
