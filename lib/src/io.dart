@@ -1,7 +1,6 @@
-import 'dart:async';
-import 'dart:isolate';
+import 'dart:async' show Completer, FutureOr, Zone;
+import 'dart:isolate' show Isolate, ReceivePort, SendPort;
 
-import 'operation.dart';
 import 'types.dart';
 
 ComputeOperation<R> compute<Q, R>(ComputeCallback<Q, R> callback, Q message) {
@@ -22,7 +21,7 @@ ComputeOperation<R> compute<Q, R>(ComputeCallback<Q, R> callback, Q message) {
     }
   }
 
-  final operation = ComputeOperationImpl<R>(finish);
+  final operation = _ComputeOperation<R>(finish);
   final configuration =
       _OperationConfiguration<Q, R>(callback, message, resultPort.sendPort);
 
@@ -67,6 +66,54 @@ ComputeOperation<R> compute<Q, R>(ComputeCallback<Q, R> callback, Q message) {
   });
 
   return operation;
+}
+
+class _ComputeOperation<R> implements ComputeOperation<R> {
+  _ComputeOperation(this.finish)
+      : completer = Completer<R?>(),
+        canceled = false;
+
+  final Completer<R?> completer;
+
+  final void Function() finish;
+
+  bool canceled;
+
+  @override
+  bool get isCanceled {
+    return canceled;
+  }
+
+  bool get isCompleted {
+    return completer.isCompleted;
+  }
+
+  @override
+  Future<R?> get value {
+    return completer.future;
+  }
+
+  @override
+  void cancel([FutureOr<R>? data]) {
+    finish();
+
+    if (!canceled) {
+      canceled = true;
+      completer.complete(data);
+    }
+  }
+
+  void complete(FutureOr<R>? data) {
+    if (!canceled) {
+      completer.complete(data);
+    }
+  }
+
+  void completeError(Object error, [StackTrace? stackTrace]) {
+    if (!canceled) {
+      completer.completeError(error, stackTrace);
+    }
+  }
 }
 
 class _OperationConfiguration<Q, R> {

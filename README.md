@@ -2,7 +2,7 @@
 
 ## cancelable-compute.dart
 
-Spawn an isolate, run callback on that isolate, passing it message, and return the value returned by callback or canceled by user.
+Allows you to cancel compute operation.
 
 ## Usage
 
@@ -12,18 +12,20 @@ A simple usage example:
 import 'package:cancelable_compute/cancelable_compute.dart';
 
 Future<void> main() async {
-  final operation = compute(fib, 256);
-  
+  var operation = compute(fib, 256);
+
   void onTap() {
     operation.cancel(-1);
   }
 
-  // ...
-  
   final result = await operation.value;
   print(result!);
 }
 ```
+
+## Note for Web
+
+Cancel don't stop running future.
 
 ## Features and bugs
 

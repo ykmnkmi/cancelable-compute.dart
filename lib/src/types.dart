@@ -13,5 +13,5 @@ abstract class ComputeOperation<R> {
 
   Future<R?> get value;
 
-  void cancel([R? value]);
+  void cancel([FutureOr<R>? data]);
 }

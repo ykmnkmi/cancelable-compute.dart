@@ -17,11 +17,9 @@ void main() {
     });
 
     test('Cancel', () {
-      final operation = compute(fib, 128);
+      final operation = compute(fib, 5);
       Future<void>.delayed(Duration(seconds: 1), operation.cancel);
-      expect(operation.value, completion(isNull));
-    }, onPlatform: <String, Object?>{
-      'browser': Skip('no Isolate'),
+      expect(operation.value, completion(5));
     });
   });
 }
