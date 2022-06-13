@@ -11,15 +11,37 @@ int fib(int n) {
 
 void main() {
   group('Cancelable Compute', () {
-    test('Normal', () {
+    test('normal', () {
       final operation = compute(fib, 5);
       expect(operation.value, completion(equals(5)));
     });
 
-    test('Cancel', () {
+    test('normal with cancel', () {
       final operation = compute(fib, 5);
       Future<void>.delayed(Duration(seconds: 1), operation.cancel);
-      expect(operation.value, completion(5));
+      expect(operation.value, completion(equals(5)));
+    });
+
+    test('cancel with null', () {
+      Future<int> delay(int n) async {
+        await Future<void>.delayed(Duration(seconds: n));
+        return fib(n);
+      }
+
+      final operation = compute(delay, 5);
+      Future<void>.delayed(Duration(seconds: 1), operation.cancel);
+      expect(operation.value, completion(isNull));
+    });
+
+    test('cancel with value', () {
+      Future<int> delay(int n) async {
+        await Future<void>.delayed(Duration(seconds: n));
+        return fib(n);
+      }
+
+      final operation = compute(delay, 5);
+      Future<void>.delayed(Duration(seconds: 1), () => operation.cancel(-1));
+      expect(operation.value, completion(equals(-1)));
     });
   });
 }

@@ -1,6 +1,4 @@
-// import 'package:cancelable_compute/cancelable_compute.dart';
-
-import 'package:cancelable_compute/src/web.dart';
+import 'package:cancelable_compute/cancelable_compute.dart';
 
 Future<void> main() async {
   final operation = compute(delayed, 5);

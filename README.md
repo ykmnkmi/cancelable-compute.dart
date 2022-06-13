@@ -2,7 +2,7 @@
 
 ## cancelable-compute.dart
 
-Allows you to cancel compute operation.
+Flutter based `compute` operation, that can be canceled with null or given value.
 
 ## Usage
 
@@ -19,7 +19,7 @@ Future<void> main() async {
   }
 
   final result = await operation.value;
-  print(result!);
+  print(result);
 }
 ```
 

@@ -1,3 +1,7 @@
+## 1.3.0
+
+- Internal changes & sync with Flutter `compute`.
+
 ## 1.2.0
 
 - Updated web implementation.

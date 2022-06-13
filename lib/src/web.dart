@@ -3,11 +3,11 @@ import 'dart:async' show Completer, FutureOr;
 import 'types.dart';
 
 ComputeOperation<R> compute<Q, R>(ComputeCallback<Q, R> callback, Q message) {
-  return _ComputeOperation<Q, R>(callback, message);
+  return _Operation<Q, R>(callback, message);
 }
 
-class _ComputeOperation<Q, R> implements ComputeOperation<R> {
-  _ComputeOperation(ComputeCallback<Q, R> callback, Q message)
+class _Operation<Q, R> implements ComputeOperation<R> {
+  _Operation(ComputeCallback<Q, R> callback, Q message)
       : completer = Completer<R?>(),
         canceled = false {
     Future<R>(() => callback(message))
