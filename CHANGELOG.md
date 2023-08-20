@@ -1,3 +1,8 @@
+## 2.0.0
+
+- Update SDK constraints to `>=3.0.0 <4.0.0`.
+- Internal changes & sync with Dart `Isolate.run`.
+
 ## 1.3.0
 
 - Internal changes & sync with Flutter `compute`.
@@ -14,7 +19,7 @@
 
 ## 1.1.0
 
-- Add a `data` parameter to `ComputeOperation<R>.cancal()`.
+- Add a `data` parameter to `ComputeOperation<R>.cancel()`.
 
 ## 1.0.2
 

@@ -1,19 +1,11 @@
 import 'dart:async' show Completer, FutureOr;
 import 'dart:isolate' show Isolate, RawReceivePort, RemoteError, SendPort;
 
-import 'package:meta/meta.dart';
+import 'package:cancelable_compute/src/types.dart';
 
-import 'types.dart';
-
+/// {@macro compute}
 ComputeOperation<R> compute<Q, R>(ComputeCallback<Q, R> callback, Q message) {
-  final completer = Completer<Object?>();
   final port = RawReceivePort();
-
-  port.handler = (Object? message) {
-    port.close();
-    completer.complete(message);
-  };
-
   Isolate? runningIsolate;
 
   void finish() {
@@ -24,42 +16,34 @@ ComputeOperation<R> compute<Q, R>(ComputeCallback<Q, R> callback, Q message) {
   final operation = _Operation<R>(finish);
   final configuration = _Configuration<Q, R>(callback, message, port.sendPort);
 
-  void onIsolate(Isolate isolate) {
-    runningIsolate = isolate;
+  port.handler = (Object? message) {
+    port.close();
 
-    void onDone(Object? value) {
-      if (value == null) {
-        throw RemoteError('Isolate exited without result or error.', '');
-      }
-
-      if (operation.isCompleted) {
-        return;
-      }
-
-      assert(value is List<Object?>);
-      value as List<Object?>;
-
-      final type = value.length;
-      assert(1 <= type && type <= 3);
-
-      switch (type) {
-        case 1:
-          operation.complete(value[0] as R);
-          break;
-
-        case 2:
-          final error = RemoteError(value[0] as String, value[1] as String);
-          operation.completeError(error);
-          break;
-
-        case 3:
-        default:
-          assert(type == 3 && value[2] == null);
-          operation.completeError(value[0] as Object, value[1] as StackTrace?);
-      }
+    if (message == null) {
+      throw RemoteError('Isolate exited without result or error.', '');
     }
 
-    completer.future.then<void>(onDone);
+    if (operation.isCompleted) {
+      return;
+    }
+
+    final list = message as List;
+
+    if (list case [Object remoteError, Object remoteTrace]) {
+      if (remoteTrace is StackTrace) {
+        operation.completeError(remoteError, remoteTrace);
+      } else {
+        final error = RemoteError('$remoteError', '$remoteTrace');
+        operation.completeError(error, error.stackTrace);
+      }
+    } else {
+      assert(list.length == 1);
+      operation.complete(list.first as R);
+    }
+  };
+
+  void onIsolate(Isolate isolate) {
+    runningIsolate = isolate;
   }
 
   void onError(Object error, [StackTrace? stackTrace]) {
@@ -67,76 +51,68 @@ ComputeOperation<R> compute<Q, R>(ComputeCallback<Q, R> callback, Q message) {
     operation.completeError(error, stackTrace);
   }
 
-  Isolate.spawn<_Configuration<Q, R>>(_spawn, configuration, //
-          errorsAreFatal: true,
-          onExit: port.sendPort,
-          onError: port.sendPort)
+  Isolate.spawn<_Configuration<Q, R>>(_spawn, configuration,
+          errorsAreFatal: true, onExit: port.sendPort, onError: port.sendPort)
       .then<void>(onIsolate)
       .catchError(onError);
 
   return operation;
 }
 
-class _Operation<R> implements ComputeOperation<R> {
-  _Operation(this.finish)
-      : completer = Completer<R?>(),
-        canceled = false;
+final class _Operation<R> implements ComputeOperation<R> {
+  _Operation(this._finish)
+      : _completer = Completer<R?>(),
+        _canceled = false;
 
-  final Completer<R?> completer;
+  final Completer<R?> _completer;
 
-  final void Function() finish;
+  final void Function() _finish;
 
-  bool canceled;
+  bool _canceled;
 
   @override
   bool get isCanceled {
-    return canceled;
+    return _canceled;
   }
 
   bool get isCompleted {
-    return completer.isCompleted;
+    return _completer.isCompleted;
   }
 
   @override
   Future<R?> get value {
-    return completer.future;
+    return _completer.future;
   }
 
   @override
   void cancel([FutureOr<R>? data]) {
-    if (canceled) {
+    if (_canceled || _completer.isCompleted) {
       return;
     }
 
-    finish();
-    canceled = true;
-
-    if (completer.isCompleted) {
-      return;
-    }
-
-    completer.complete(data);
+    _finish();
+    _canceled = true;
+    _completer.complete(data);
   }
 
   void complete(FutureOr<R>? data) {
-    if (canceled || completer.isCompleted) {
+    if (_canceled || _completer.isCompleted) {
       return;
     }
 
-    completer.complete(data);
+    _completer.complete(data);
   }
 
   void completeError(Object error, [StackTrace? stackTrace]) {
-    if (canceled || completer.isCompleted) {
+    if (_canceled || _completer.isCompleted) {
       return;
     }
 
-    completer.completeError(error, stackTrace);
+    _completer.completeError(error, stackTrace);
   }
 }
 
-@immutable
-class _Configuration<Q, R> {
+final class _Configuration<Q, R> {
   const _Configuration(this.callback, this.message, this.port);
 
   final ComputeCallback<Q, R> callback;
@@ -151,20 +127,20 @@ class _Configuration<Q, R> {
 }
 
 Future<void> _spawn<Q, R>(_Configuration<Q, R> configuration) {
-  void onValue(R value) {
-    final list = List<R>.filled(1, value);
+  void onValue(Object? value) {
+    final list = List<Object?>.filled(1, value);
     Isolate.exit(configuration.port, list);
   }
 
   void onError(Object error, [StackTrace? stackTrace]) {
-    final list = List<Object?>.filled(3, null)
+    final list = List<Object?>.filled(2, null)
       ..[0] = error
       ..[1] = stackTrace;
 
     Isolate.exit(configuration.port, list);
   }
 
-  return Future<R>.sync(configuration.apply)
+  return Future<Object?>.sync(configuration.apply)
       .then<void>(onValue)
       .catchError(onError);
 }

@@ -1,9 +1,12 @@
-library compute;
+import 'package:cancelable_compute/src/io.dart'
+    if (dart.library.js) 'package:cancelable_compute/src/js.dart'
+    as implementation;
+import 'package:cancelable_compute/src/types.dart';
 
-import 'src/io.dart' if (dart.library.html) 'src/web.dart' as implementation;
-import 'src/types.dart';
+export 'package:cancelable_compute/src/types.dart';
 
-export 'src/types.dart';
-
-/// Runs a function with a given argument in isolate, and returns an operation that can be canceled.
+/// {@template compute}
+/// Runs a function with a given argument in an isolate, and returns an
+/// operation that can be canceled.
+/// {@endtemplate}
 const Compute compute = implementation.compute;

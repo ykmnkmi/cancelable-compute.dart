@@ -2,7 +2,7 @@
 
 ## cancelable-compute.dart
 
-Flutter based `compute` operation, that can be canceled with null or given value.
+Flutter-based compute operation that can be canceled with either null or a specific value.
 
 ## Usage
 
@@ -25,7 +25,7 @@ Future<void> main() async {
 
 ## Note for Web
 
-Cancel don't stop running future.
+Canceling doesn't stop the running future.
 
 ## Features and bugs
 
