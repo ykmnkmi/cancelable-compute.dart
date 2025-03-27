@@ -1,7 +1,7 @@
 name: cancelable_compute
 description: >
   Flutter-based compute operation that can be canceled with either null or a specific value.
-version: 2.1.0
+version: 2.1.1
 homepage: https://github.com/ykmnkmi/cancelable-compute.dart
 repository: https://github.com/ykmnkmi/cancelable-compute.dart
 issue_tracker: https://github.com/ykmnkmi/cancelable-compute.dart/issues
@@ -11,8 +11,7 @@ environment:
 
 dev_dependencies:
   build_runner: ^2.4.15
+  build_test: ^2.2.3
   build_web_compilers: ^4.1.2
   lints: ^5.1.1
   test: ^1.25.15
-dependencies:
-  build_test: ^2.2.3

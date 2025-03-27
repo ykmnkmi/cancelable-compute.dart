@@ -13,48 +13,40 @@ ComputeOperation<R> compute<Q, R>(
 
 final class _Operation<Q, R> implements ComputeOperation<R> {
   _Operation(ComputeCallback<Q, R> callback, Q message)
-    : _completer = Completer<R?>(),
-      _isCanceled = false {
+    : completer = Completer<R?>(),
+      isCanceled = false {
     Future<R>(
       () => callback(message),
     ).then<void>(complete).catchError(completeError);
   }
 
-  final Completer<R?> _completer;
-
-  bool _isCanceled;
+  final Completer<R?> completer;
 
   @override
-  bool get isCanceled {
-    return _isCanceled;
-  }
-
-  bool get isCompleted {
-    return _completer.isCompleted;
-  }
+  bool isCanceled;
 
   @override
   Future<R?> get value {
-    return _completer.future;
+    return completer.future;
   }
 
   @override
   void cancel([FutureOr<R?>? value]) {
-    if (!(_completer.isCompleted || _isCanceled)) {
-      _isCanceled = true;
-      _completer.complete(value);
+    if (!(completer.isCompleted || isCanceled)) {
+      isCanceled = true;
+      completer.complete(value);
     }
   }
 
   void complete(FutureOr<R?>? data) {
-    if (!(_isCanceled || _completer.isCompleted)) {
-      _completer.complete(data);
+    if (!(isCanceled || completer.isCompleted)) {
+      completer.complete(data);
     }
   }
 
   void completeError(Object error, [StackTrace? stackTrace]) {
-    if (!(_isCanceled || _completer.isCompleted)) {
-      _completer.completeError(error, stackTrace);
+    if (!(isCanceled || completer.isCompleted)) {
+      completer.completeError(error, stackTrace);
     }
   }
 }

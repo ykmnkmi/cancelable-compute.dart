@@ -1,3 +1,7 @@
+## 2.1.1
+
+- Dependencies fix.
+
 ## 2.1.0
 
 - Update SDK constraints to `>=3.7.0 <4.0.0`.
