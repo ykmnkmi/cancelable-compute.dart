@@ -12,7 +12,7 @@ A simple usage example:
 import 'package:cancelable_compute/cancelable_compute.dart';
 
 Future<void> main() async {
-  var operation = compute(fib, 256);
+  var operation = compute(fib, 255);
 
   void onTap() {
     operation.cancel(-1);
@@ -25,7 +25,28 @@ Future<void> main() async {
 
 ## Note for Web
 
-Canceling doesn't stop the running future.
+Canceling doesn't stop the running future. The future will continue to
+execute, but the value future will resolve immediately with null (or the
+provided data if cancel was called with data) instead of waiting for the
+computation to finish.
+
+```dart
+import 'package:cancelable_compute/cancelable_compute.dart';
+
+Future<void> main() async {
+  var operation = compute((_) async {
+    await Future<void>.delayed(Duration(seconds: 5)); // Long running task
+    return 'Completed';
+  }, 0);
+
+  Future<void>.delayed(Duration(seconds: 1), () {
+    operation.cancel('Canceled');
+  });
+
+  final result = await operation.value;
+  print(result); // Will print "Canceled" after 1 second on web.
+}
+```
 
 ## Features and bugs
 

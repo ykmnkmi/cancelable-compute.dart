@@ -1,22 +1,28 @@
 import 'package:cancelable_compute/cancelable_compute.dart';
 
-int fib(int n) {
+Future<int> fib(int n) async {
   if (n < 2) {
     return n;
   }
 
-  return fib(n - 2) + fib(n - 1);
+  await Future<void>.delayed(Duration(milliseconds: n));
+
+  final futures = <Future<int>>[fib(n - 2), fib(n - 1)];
+  final values = await Future.wait<int>(futures);
+  return values.reduce((a, b) => a + b);
 }
 
-Future<int> delayed(int n) async {
-  await Future<void>.delayed(Duration(seconds: n ~/ 2));
+Future<int> delayedFib(int n) async {
   return fib(n);
 }
 
 Future<void> main() async {
-  final operation = compute(delayed, 4);
-  Future<void>.delayed(Duration(seconds: 1), operation.cancel);
+  final operation = compute<int, int>(delayedFib, 32);
+
+  Future<void>.delayed(Duration(seconds: 1), () {
+    operation.cancel(-1);
+  });
 
   final result = await operation.value;
-  print(result ?? -1);
+  print(result); // -1
 }

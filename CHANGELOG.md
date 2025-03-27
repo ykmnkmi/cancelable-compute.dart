@@ -1,7 +1,15 @@
+## 2.1.0
+
+- Update SDK constraints to `>=3.7.0 <4.0.0`.
+- Internal changes & sync with Flutter `compute`.
+- Update `lints` package constraints to `^5.1.1`.
+- Update `test` package constraints to `^1.25.16`.
+- Update package meta.
+
 ## 2.0.0
 
 - Update SDK constraints to `>=3.0.0 <4.0.0`.
-- Internal changes & sync with Dart `Isolate.run`.
+- Internal changes & sync with Flutter `compute`.
 
 ## 1.3.0
 
@@ -15,7 +23,7 @@
 
 ## 1.1.1
 
-- Update meta.
+- Update package meta.
 
 ## 1.1.0
 
@@ -23,11 +31,11 @@
 
 ## 1.0.2
 
-- Moving from pedantic to lints package.
+- Moving from `pedantic` to `lints` package.
 
 ## 1.0.1
 
-- Update meta.
+- Update package meta.
 
 ## 1.0.0
 
